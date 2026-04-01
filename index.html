@@ -146,6 +146,187 @@
 
   /* FILTER */
   .hidden { display: none !important; }
+
+  /* SHOPPING CART */
+  .cart-icon-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background: var(--red);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+  }
+  .cart-icon-btn:hover { transform: scale(1.1); }
+  .cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FFD700;
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .cart-modal {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    background: var(--white);
+    box-shadow: -2px 0 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: right 0.3s;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .cart-modal.open { right: 0; }
+  .cart-header {
+    background: var(--red);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--light);
+  }
+  .cart-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .cart-items {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  .cart-item {
+    background: var(--light);
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cart-item-info { flex: 1; }
+  .cart-item-name {
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+  .cart-item-price {
+    color: #FFD700;
+    font-size: 0.9rem;
+  }
+  .cart-item-qty {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    margin-right: 0.5rem;
+  }
+  .cart-item-qty button {
+    background: var(--red);
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+  .cart-item-remove {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+  .cart-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text);
+  }
+  .cart-footer {
+    background: var(--light);
+    padding: 1rem;
+    border-top: 2px solid var(--red);
+  }
+  .cart-total {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+  .checkout-btn {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .checkout-btn:hover { opacity: 0.9; }
+  .checkout-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+  }
+
+  .product-item {
+    background: var(--light);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .product-item:hover { transform: scale(1.05); }
+  .product-name {
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .product-price {
+    color: #FFD700;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+  }
+  .add-to-cart-btn {
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: opacity 0.2s;
+  }
+  .add-to-cart-btn:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -159,6 +340,27 @@
   </div>
 </header>
 
+<!-- Shopping Cart Button -->
+<button class="cart-icon-btn" onclick="toggleCart()">
+  🛒
+  <span class="cart-count" id="cartCount">0</span>
+</button>
+
+<!-- Shopping Cart Modal -->
+<div class="cart-modal" id="cartModal">
+  <div class="cart-header">
+    <h2>Кошница 🛒</h2>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Кошницата е празна</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">Общо: <span id="cartTotal">0.00 лв</span></div>
+    <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>Поръчай</button>
+  </div>
+</div>
+
 <nav id="nav">
   <button class="active" onclick="filter('all', this)">Всички</button>
   <button onclick="filter('гривни', this)">Гривни</button>
@@ -169,6 +371,45 @@
   <button onclick="filter('вълнени', this)">Вълнени гривни</button>
   <button onclick="filter('памучни', this)">Памучни</button>
 </nav>
+
+<main>
+
+  <!-- PRODUCTS SECTION WITH ADD TO CART -->
+  <div style="max-width: 960px; margin: 2rem auto; padding: 0 1rem;">
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--red); font-size: 1.5rem; margin-bottom: 1.2rem; border-bottom: 2px solid var(--light); padding-bottom: 0.5rem;">🛍️ Брослук Примери</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+      <div class="product-item">
+        <div class="product-name">Червена гривна</div>
+        <div class="product-price">12.00 лв</div>
+        <button class="add-to-cart-btn" onclick="addToCart('Червена гривна', '12.00')">+ Кошница</button>
+      </div>
+      <div class="product-item">
+        <div class="product-name">Черна гривна</div>
+        <div class="product-price">12.00 лв</div>
+        <button class="add-to-cart-btn" onclick="addToCart('Черна гривна', '12.00')">+ Кошница</button>
+      </div>
+      <div class="product-item">
+        <div class="product-name">Бяла гривна</div>
+        <div class="product-price">12.00 лв</div>
+        <button class="add-to-cart-btn" onclick="addToCart('Бяла гривна', '12.00')">+ Кошница</button>
+      </div>
+      <div class="product-item">
+        <div class="product-name">Мултиколор</div>
+        <div class="product-price">15.00 лв</div>
+        <button class="add-to-cart-btn" onclick="addToCart('Мултиколор', '15.00')">+ Кошница</button>
+      </div>
+      <div class="product-item">
+        <div class="product-name">Брошка мая</div>
+        <div class="product-price">8.00 лв</div>
+        <button class="add-to-cart-btn" onclick="addToCart('Брошка мая', '8.00')">+ Кошница</button>
+      </div>
+      <div class="product-item">
+        <div class="product-name">Брошка роза</div>
+        <div class="product-price">10.00 лв</div>
+        <button class="add-to-cart-btn" onclick="addToCart('Брошка роза', '10.00')">+ Кошница</button>
+      </div>
+    </div>
+  </div>
 
 <main>
 
@@ -274,6 +515,118 @@ function filter(cat, btn) {
     }
   });
 }
+</script>
+
+<!-- Shopping Cart JavaScript -->
+<script>
+// Shopping Cart System
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function toggleCart() {
+  document.getElementById('cartModal').classList.toggle('open');
+}
+
+function addToCart(name, price) {
+  const existingItem = cart.find(item => item.name === name);
+  if (existingItem) {
+    existingItem.qty++;
+  } else {
+    cart.push({ name, price: parseFloat(price), qty: 1 });
+  }
+  saveCart();
+  updateCart();
+  showNotification(`${name} добавен в кошницата!`);
+}
+
+function removeFromCart(name) {
+  cart = cart.filter(item => item.name !== name);
+  saveCart();
+  updateCart();
+}
+
+function updateQty(name, change) {
+  const item = cart.find(item => item.name === name);
+  if (item) {
+    item.qty += change;
+    if (item.qty <= 0) removeFromCart(name);
+    else {
+      saveCart();
+      updateCart();
+    }
+  }
+}
+
+function saveCart() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function updateCart() {
+  const cartItems = document.getElementById('cartItems');
+  const cartCount = document.getElementById('cartCount');
+  const cartTotal = document.getElementById('cartTotal');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<div class="cart-empty">Кошницата е празна</div>';
+    cartCount.textContent = '0';
+    cartTotal.textContent = '0.00 лв';
+    checkoutBtn.disabled = true;
+    return;
+  }
+
+  let total = 0;
+  cartItems.innerHTML = cart.map(item => {
+    const itemTotal = item.price * item.qty;
+    total += itemTotal;
+    return `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">${item.price.toFixed(2)} лв х ${item.qty}</div>
+        </div>
+        <div class="cart-item-qty">
+          <button onclick="updateQty('${item.name}', -1)">−</button>
+          <span>${item.qty}</span>
+          <button onclick="updateQty('${item.name}', 1)">+</button>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCart('${item.name}')">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  cartCount.textContent = cart.reduce((sum, item) => sum + item.qty, 0);
+  cartTotal.textContent = total.toFixed(2) + ' лв';
+  checkoutBtn.disabled = false;
+}
+
+function checkout() {
+  if (cart.length === 0) return;
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const cartSummary = cart.map(item => `${item.name} x${item.qty}`).join(', ');
+  const message = `Здравей! Искам да поръчам: ${cartSummary}. Обща цена: ${total.toFixed(2)} лв`;
+  window.location.href = `https://msng.link/vi/359889128472?text=${encodeURIComponent(message)}`;
+}
+
+function showNotification(msg) {
+  const notif = document.createElement('div');
+  notif.textContent = msg;
+  notif.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--red);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+  `;
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 2000);
+}
+
+// Initialize cart on page load
+updateCart();
 </script>
 </body>
 </html>
