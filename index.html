@@ -128,44 +128,11 @@
     overflow: hidden;
     box-shadow: 0 4px 24px rgba(192,57,43,0.10);
     margin-bottom: 2.5rem;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s;
   }
-  .page-image-wrap:hover { transform: scale(1.02); }
   .page-image-wrap img {
     width: 100%;
     display: block;
   }
-  .image-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-    color: white;
-    padding: 1.5rem 1rem 1rem;
-    text-align: center;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .page-image-wrap:hover .image-overlay { opacity: 1; }
-  .overlay-title {
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-  }
-  .overlay-price {
-    color: #FFD700;
-    font-weight: 700;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.5rem 0.8rem;
-    background: var(--red);
-    border-radius: 4px;
-    display: inline-block;
-  }
-  .overlay-price:hover { opacity: 0.9; }
 
   /* FOOTER */
   footer {
@@ -390,8 +357,7 @@
   </div>
   <div class="cart-footer">
     <div class="cart-total">Общо: <span id="cartTotal">0.00 лв</span></div>
-    <button class="checkout-btn" onclick="copyCartToClipboard()" id="copyBtn" style="background: #4CAF50; margin-bottom: 0.5rem;" disabled>📋 Копирай</button>
-    <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>📱 Viber Поръчка</button>
+    <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>Поръчай</button>
   </div>
 </div>
 
@@ -599,14 +565,12 @@ function updateCart() {
   const cartCount = document.getElementById('cartCount');
   const cartTotal = document.getElementById('cartTotal');
   const checkoutBtn = document.getElementById('checkoutBtn');
-  const copyBtn = document.getElementById('copyBtn');
 
   if (cart.length === 0) {
     cartItems.innerHTML = '<div class="cart-empty">Кошницата е празна</div>';
     cartCount.textContent = '0';
     cartTotal.textContent = '0.00 лв';
     checkoutBtn.disabled = true;
-    copyBtn.disabled = true;
     return;
   }
 
@@ -618,7 +582,7 @@ function updateCart() {
       <div class="cart-item">
         <div class="cart-item-info">
           <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-price">${item.price.toFixed(2)} лв х ${item.qty} = ${itemTotal.toFixed(2)} лв</div>
+          <div class="cart-item-price">${item.price.toFixed(2)} лв х ${item.qty}</div>
         </div>
         <div class="cart-item-qty">
           <button onclick="updateQty('${item.name}', -1)">−</button>
@@ -633,7 +597,6 @@ function updateCart() {
   cartCount.textContent = cart.reduce((sum, item) => sum + item.qty, 0);
   cartTotal.textContent = total.toFixed(2) + ' лв';
   checkoutBtn.disabled = false;
-  copyBtn.disabled = false;
 }
 
 function checkout() {
@@ -642,16 +605,6 @@ function checkout() {
   const cartSummary = cart.map(item => `${item.name} x${item.qty}`).join(', ');
   const message = `Здравей! Искам да поръчам: ${cartSummary}. Обща цена: ${total.toFixed(2)} лв`;
   window.location.href = `https://msng.link/vi/359889128472?text=${encodeURIComponent(message)}`;
-}
-
-function copyCartToClipboard() {
-  if (cart.length === 0) return;
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const cartSummary = cart.map(item => `${item.name} x${item.qty} - ${(item.price * item.qty).toFixed(2)} лв`).join('\n');
-  const message = `🛍️ ПОРЪЧКА:\n${cartSummary}\n\n💰 ОБЩА ЦЕНА: ${total.toFixed(2)} лв`;
-  navigator.clipboard.writeText(message).then(() => {
-    showNotification('✓ Поръчката е копирана!');
-  });
 }
 
 function showNotification(msg) {
@@ -674,35 +627,6 @@ function showNotification(msg) {
 
 // Initialize cart on page load
 updateCart();
-
-// Add clickable overlays to catalog images
-document.addEventListener('DOMContentLoaded', function() {
-  const products = [
-    { selector: '.catalog-section[data-cats="all"] .page-image-wrap', name: 'Каталог Корица', price: '25.00' },
-    { selector: '.catalog-section[data-cats="гривни"] .page-image-wrap:nth-child(1)', name: 'Червена Гривна', price: '15.00' },
-    { selector: '.catalog-section[data-cats="гривни"] .page-image-wrap:nth-child(2)', name: 'Черна Гривна', price: '15.00' },
-    { selector: '.catalog-section[data-cats="гривни"] .page-image-wrap:nth-child(3)', name: 'Мултиколор Гривна', price: '18.00' },
-    { selector: '.catalog-section[data-cats="дом"] .page-image-wrap:nth-child(1)', name: 'Украса За Дом', price: '20.00' },
-    { selector: '.catalog-section[data-cats="дом"] .page-image-wrap:nth-child(2)', name: 'Офис Украса', price: '22.00' },
-    { selector: '.catalog-section[data-cats="жени"] .page-image-wrap', name: 'Брошка За Жени', price: '12.00' },
-    { selector: '.catalog-section[data-cats="деца"] .page-image-wrap', name: 'За Деца', price: '10.00' },
-  ];
-
-  products.forEach(product => {
-    const elements = document.querySelectorAll(product.selector);
-    elements.forEach(el => {
-      if (!el.querySelector('.image-overlay')) {
-        const overlay = document.createElement('div');
-        overlay.className = 'image-overlay';
-        overlay.innerHTML = `
-          <div class="overlay-title">${product.name}</div>
-          <div class="overlay-price" onclick="event.stopPropagation(); addToCart('${product.name}', '${product.price}')">${product.price} лв 🛒</div>
-        `;
-        el.appendChild(overlay);
-      }
-    });
-  });
-});
 </script>
 </body>
 </html>
